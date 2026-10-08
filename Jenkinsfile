@@ -16,7 +16,11 @@ pipeline {
             steps {
                 dir('backend') {
                     script {
-                        if (isUnix()) { sh 'mvn clean test' } else { bat 'mvn clean test' }
+                        if (isUnix()) {
+                            sh 'chmod +x mvnw && ./mvnw clean test'
+                        } else {
+                            bat 'mvnw.cmd clean test'
+                        }
                     }
                 }
             }
@@ -31,7 +35,11 @@ pipeline {
             steps {
                 dir('backend') {
                     script {
-                        if (isUnix()) { sh 'mvn package -DskipTests' } else { bat 'mvn package -DskipTests' }
+                        if (isUnix()) {
+                            sh './mvnw package -DskipTests'
+                        } else {
+                            bat 'mvnw.cmd package -DskipTests'
+                        }
                     }
                 }
             }

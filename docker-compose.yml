@@ -1,0 +1,48 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: projet-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gestion_projets
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+
+  backend:
+    build: ./backend
+    container_name: projet-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/gestion_projets?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8083:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - app-net
+
+  frontend:
+    build: ./frontend
+    container_name: projet-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - app-net
+
+networks:
+  app-net:
+
+volumes:
+  db-data:
